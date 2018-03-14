@@ -5,7 +5,7 @@ Simple log library for Go language.
 
 ####Install
 
-    go get github.com/skoo87/log4go
+    go get github.com/kdpujie/log4go
 
 ####Usages
 Refer to examples
