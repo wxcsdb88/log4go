@@ -1,24 +1,15 @@
 log4go
 ======
 
-Simple log library for Go language.
+轻量级log模块，源于google的一项log工程，官方已经停止维护更新，这里fork一份自用。
 
 ####Install
 
     go get github.com/kdpujie/log4go
 
-####Usages
-Refer to examples
-
 ####Features
-* Output log to file, the file can be rotated by itself.
-* Output log to console.
-* Output log to remote server with syslog protocol.
+* 日志输出到文件，支持按日期对文件进行分割
+* 日志输出到控制台
+* 支持syslog协议.
 
-
-####TODO
-1. ~~syslog~~
-2. udp/tcp writer
-3. more of rules of log rotation
-4. custom the format of log
 
