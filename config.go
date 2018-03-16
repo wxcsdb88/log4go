@@ -8,13 +8,13 @@ import (
 )
 
 type ConfFileWriter struct {
-	logPath string `json:"log_path"`
-	on      bool   `json:"on"`
+	LogPath string `json:"log_path"`
+	On      bool   `json:"on"`
 }
 
 type ConfConsoleWriter struct {
-	on    bool `json:"on"`
-	color bool `json:"color"`
+	On    bool `json:"on"`
+	Color bool `json:"color"`
 }
 
 type ConfAliLogHubWriter struct {
@@ -45,15 +45,15 @@ func SetupLogWithConf(file string) (err error) {
 		return
 	}
 
-	if lc.FileWriter.on {
+	if lc.FileWriter.On {
 		w := NewFileWriter()
-		w.SetPathPattern(lc.FileWriter.logPath)
+		w.SetPathPattern(lc.FileWriter.LogPath)
 		Register(w)
 	}
 
-	if lc.ConsoleWriter.on {
+	if lc.ConsoleWriter.On {
 		w := NewConsoleWriter()
-		w.SetColor(lc.ConsoleWriter.color)
+		w.SetColor(lc.ConsoleWriter.Color)
 		Register(w)
 	}
 
