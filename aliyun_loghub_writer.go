@@ -10,7 +10,6 @@ import (
 	"github.com/aliyun/aliyun-log-go-sdk"
 	"github.com/gogo/protobuf/proto"
 	"time"
-	"bufio"
 )
 
 
@@ -48,8 +47,6 @@ func (w *AliLogHubWriter) Init() (err error) {
 		return
 	}
 	w.store, err = w.project.GetLogStore(w.storeName)
-	b := bufio.ReadWriter{}
-	b.ReadLine()
 	return
 }
 
