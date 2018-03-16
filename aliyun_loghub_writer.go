@@ -89,11 +89,8 @@ func (w *AliLogHubWriter) Flush() error {
 	return nil
 }
 
-func (w *AliLogHubWriter) SetLogName(logName string) {
+func (w *AliLogHubWriter) SetLog(logName, logSource string) {
 	w.logName = logName
-}
-
-func (w *AliLogHubWriter) SetLogSource(logSource string) {
 	w.logSource = logSource
 }
 

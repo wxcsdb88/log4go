@@ -25,7 +25,7 @@ type ConfAliLogHubWriter struct {
 	accessKeyId     string `json:"access_key_id"`
 	accessKeySecret string `json:"access_key_secret"`
 	storeName       string `json:"store_name"`
-	bufSize         string `json:"buf_size"`
+	bufSize         int    `json:"buf_size"`
 }
 
 type LogConfig struct {
@@ -57,7 +57,12 @@ func SetupLogWithConf(file string) (err error) {
 	}
 
 	if lc.aliLoghubWriter.on {
-
+		w := NewAliLogHubWriter(lc.aliLoghubWriter.bufSize)
+		w.SetLog(lc.aliLoghubWriter.logName, lc.aliLoghubWriter.logSource)
+		w.SetProject(lc.aliLoghubWriter.projectName, lc.aliLoghubWriter.storeName)
+		w.SetEndpoint(lc.aliLoghubWriter.endpoint)
+		w.SetAccessKey(lc.aliLoghubWriter.accessKeyId, lc.aliLoghubWriter.accessKeySecret)
+		Register(w)
 	}
 
 	switch lc.level {
