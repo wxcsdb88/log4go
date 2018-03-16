@@ -12,32 +12,24 @@ import (
 	"time"
 )
 
-
 type AliLogHubWriter struct {
-	logName 		string
-	logSource 		string
-	projectName 	string
-	endpoint    	string
+	logName         string
+	logSource       string
+	projectName     string
+	endpoint        string
 	accessKeyId     string
 	accessKeySecret string
-	storeName 		string
-	project 		*sls.LogProject
-	store 			*sls.LogStore
-	bufLogs 		[]*sls.Log
-	n 				int
-	err 			error
+	storeName       string
+	project         *sls.LogProject
+	store           *sls.LogStore
+	bufLogs         []*sls.Log
+	n               int
+	err             error
 }
 
-func NewAliLogHubWriter(lName, lSource, pName, endpoint, keyId, keySecret, sName string, bufSize int) *AliLogHubWriter {
+func NewAliLogHubWriter(bufSize int) *AliLogHubWriter {
 	return &AliLogHubWriter{
-		logName:lName,
-		logSource:lSource,
-		projectName:pName,
-		endpoint:endpoint,
-		accessKeyId:keyId,
-		accessKeySecret:keySecret,
-		storeName:sName,
-		bufLogs:make([]*sls.Log, bufSize),
+		bufLogs: make([]*sls.Log, bufSize),
 	}
 }
 
@@ -97,12 +89,34 @@ func (w *AliLogHubWriter) Flush() error {
 	return nil
 }
 
+func (w *AliLogHubWriter) SetLogName(logName string) {
+	w.logName = logName
+}
+
+func (w *AliLogHubWriter) SetLogSource(logSource string) {
+	w.logSource = logSource
+}
+
+func (w *AliLogHubWriter) SetProject(pName, sName string) {
+	w.projectName = pName
+	w.storeName = sName
+}
+
+func (w *AliLogHubWriter) SetEndpoint(endpoint string) {
+	w.endpoint = endpoint
+}
+
+func (w *AliLogHubWriter) SetAccessKey(accessKeyId, accessKeySecret string) {
+	w.accessKeyId = accessKeyId
+	w.accessKeySecret = accessKeySecret
+}
+
 func (w *AliLogHubWriter) writeBuf(log *sls.Log) error {
-	if w.available() <=0 && w.Flush() != nil {
+	if w.available() <= 0 && w.Flush() != nil {
 		return w.err
 	}
 	w.bufLogs[w.n] = log
-	w.n ++
+	w.n++
 	return nil
 }
 
