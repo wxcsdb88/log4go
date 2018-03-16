@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log4go"
+	"github.com/kdpujie/log4go"
 )
 
 func SetLog() (logger *log4go.Logger) {
