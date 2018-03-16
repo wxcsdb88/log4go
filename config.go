@@ -3,6 +3,7 @@ package log4go
 import (
 	"encoding/json"
 	"errors"
+	"github.com/kdpujie/log4go/util"
 	"io/ioutil"
 )
 
@@ -58,6 +59,9 @@ func SetupLogWithConf(file string) (err error) {
 
 	if lc.aliLoghubWriter.on {
 		w := NewAliLogHubWriter(lc.aliLoghubWriter.bufSize)
+		if lc.aliLoghubWriter.logSource == "" {
+			lc.aliLoghubWriter.logSource = util.GetLocalIpByTcp()
+		}
 		w.SetLog(lc.aliLoghubWriter.logName, lc.aliLoghubWriter.logSource)
 		w.SetProject(lc.aliLoghubWriter.projectName, lc.aliLoghubWriter.storeName)
 		w.SetEndpoint(lc.aliLoghubWriter.endpoint)
