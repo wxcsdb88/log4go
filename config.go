@@ -2,7 +2,7 @@ package log4go
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"github.com/kdpujie/log4go/util"
 	"io/ioutil"
 )
@@ -18,22 +18,22 @@ type ConfConsoleWriter struct {
 }
 
 type ConfAliLogHubWriter struct {
-	on              bool   `json:"on"`
-	logName         string `json:"log_name"`
-	logSource       string `json:"log_source"`
-	projectName     string `json:"project_name"`
-	endpoint        string `json:"endpoint"`
-	accessKeyId     string `json:"access_key_id"`
-	accessKeySecret string `json:"access_key_secret"`
-	storeName       string `json:"store_name"`
-	bufSize         int    `json:"buf_size"`
+	On              bool   `json:"on"`
+	LogName         string `json:"log_name"`
+	LogSource       string `json:"log_source"`
+	ProjectName     string `json:"project_name"`
+	Endpoint        string `json:"endpoint"`
+	AccessKeyId     string `json:"access_key_id"`
+	AccessKeySecret string `json:"access_key_secret"`
+	StoreName       string `json:"store_name"`
+	BufSize         int    `json:"buf_size"`
 }
 
 type LogConfig struct {
-	level           string              `json:"level"`
-	fileWriter      ConfFileWriter      `json:"file_writer"`
-	consoleWriter   ConfConsoleWriter   `json:"console_writer"`
-	aliLoghubWriter ConfAliLogHubWriter `json:"ali_loghub_writer"`
+	Level           string              `json:"level"`
+	FileWriter      ConfFileWriter      `json:"file_writer"`
+	ConsoleWriter   ConfConsoleWriter   `json:"console_writer"`
+	AliLoghubWriter ConfAliLogHubWriter `json:"ali_loghub_writer"`
 }
 
 func SetupLogWithConf(file string) (err error) {
@@ -45,31 +45,31 @@ func SetupLogWithConf(file string) (err error) {
 		return
 	}
 
-	if lc.fileWriter.on {
+	if lc.FileWriter.on {
 		w := NewFileWriter()
-		w.SetPathPattern(lc.fileWriter.logPath)
+		w.SetPathPattern(lc.FileWriter.logPath)
 		Register(w)
 	}
 
-	if lc.consoleWriter.on {
+	if lc.ConsoleWriter.on {
 		w := NewConsoleWriter()
-		w.SetColor(lc.consoleWriter.color)
+		w.SetColor(lc.ConsoleWriter.color)
 		Register(w)
 	}
 
-	if lc.aliLoghubWriter.on {
-		w := NewAliLogHubWriter(lc.aliLoghubWriter.bufSize)
-		if lc.aliLoghubWriter.logSource == "" {
-			lc.aliLoghubWriter.logSource = util.GetLocalIpByTcp()
+	if lc.AliLoghubWriter.On {
+		w := NewAliLogHubWriter(lc.AliLoghubWriter.BufSize)
+		if lc.AliLoghubWriter.LogSource == "" {
+			lc.AliLoghubWriter.LogSource = util.GetLocalIpByTcp()
 		}
-		w.SetLog(lc.aliLoghubWriter.logName, lc.aliLoghubWriter.logSource)
-		w.SetProject(lc.aliLoghubWriter.projectName, lc.aliLoghubWriter.storeName)
-		w.SetEndpoint(lc.aliLoghubWriter.endpoint)
-		w.SetAccessKey(lc.aliLoghubWriter.accessKeyId, lc.aliLoghubWriter.accessKeySecret)
+		w.SetLog(lc.AliLoghubWriter.LogName, lc.AliLoghubWriter.LogSource)
+		w.SetProject(lc.AliLoghubWriter.ProjectName, lc.AliLoghubWriter.StoreName)
+		w.SetEndpoint(lc.AliLoghubWriter.Endpoint)
+		w.SetAccessKey(lc.AliLoghubWriter.AccessKeyId, lc.AliLoghubWriter.AccessKeySecret)
 		Register(w)
 	}
 
-	switch lc.level {
+	switch lc.Level {
 	case "debug":
 		SetLevel(DEBUG)
 
@@ -86,7 +86,7 @@ func SetupLogWithConf(file string) (err error) {
 		SetLevel(FATAL)
 
 	default:
-		err = errors.New("Invalid log level")
+		err = fmt.Errorf("request level[debug|info|warning|error|fatal], not suported[%s]", lc.Level)
 	}
 	return
 }
