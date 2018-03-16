@@ -88,7 +88,7 @@ func (w *AliLogHubWriter) Flush() error {
 	logGroup := &sls.LogGroup{
 		Topic:  proto.String(w.logName),
 		Source: proto.String(w.logSource),
-		Logs:   w.bufLogs,
+		Logs:   w.bufLogs[0:w.n],
 	}
 	if w.err = w.store.PutLogs(logGroup); w.err != nil {
 		return w.err
