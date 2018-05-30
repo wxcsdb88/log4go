@@ -13,6 +13,7 @@ import (
 )
 
 type AliLogHubWriter struct {
+	level           int
 	logName         string
 	logSource       string
 	projectName     string
@@ -43,6 +44,9 @@ func (w *AliLogHubWriter) Init() (err error) {
 }
 
 func (w *AliLogHubWriter) Write(r *Record) (err error) {
+	if r.level < w.level {
+		return
+	}
 	content := []*sls.LogContent{}
 	content = append(content, &sls.LogContent{
 		Key:   proto.String("time"),

@@ -34,6 +34,7 @@ func (r *colorRecord) String() string {
 }
 
 type ConsoleWriter struct {
+	level int
 	color bool
 }
 
@@ -42,6 +43,9 @@ func NewConsoleWriter() *ConsoleWriter {
 }
 
 func (w *ConsoleWriter) Write(r *Record) error {
+	if r.level < w.level {
+		return nil
+	}
 	if w.color {
 		fmt.Fprint(os.Stdout, ((*colorRecord)(r)).String())
 	} else {

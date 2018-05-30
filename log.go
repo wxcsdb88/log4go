@@ -51,9 +51,9 @@ type Flusher interface {
 }
 
 type Logger struct {
-	writers     []Writer
-	tunnel      chan *Record
-	level       int
+	writers []Writer
+	tunnel  chan *Record
+	//level       int
 	lastTime    int64
 	lastTimeStr string
 	c           chan bool
@@ -70,7 +70,7 @@ func NewLogger() *Logger {
 	l.writers = make([]Writer, 0, 2)
 	l.tunnel = make(chan *Record, tunnel_size_default)
 	l.c = make(chan bool, 1)
-	l.level = DEBUG
+	//l.level = DEBUG
 	l.layout = "2006/01/02 15:04:05"
 
 	go boostrapLogWriter(l)
@@ -86,7 +86,7 @@ func (l *Logger) Register(w Writer) {
 }
 
 func (l *Logger) SetLevel(lvl int) {
-	l.level = lvl
+	//l.level = lvl
 }
 
 func (l *Logger) SetLayout(layout string) {
@@ -129,9 +129,9 @@ func (l *Logger) Close() {
 func (l *Logger) deliverRecordToWriter(level int, format string, args ...interface{}) {
 	var inf, code string
 
-	if level < l.level {
+	/*	if level < l.level {
 		return
-	}
+	}*/
 
 	if format != "" {
 		inf = fmt.Sprintf(format, args...)
@@ -231,7 +231,7 @@ var (
 )
 
 func SetLevel(lvl int) {
-	logger_default.level = lvl
+	//logger_default.level = lvl
 }
 
 func SetLayout(layout string) {

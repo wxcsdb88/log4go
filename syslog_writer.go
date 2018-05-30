@@ -12,6 +12,7 @@ func (r *ShortRecord) String() string {
 }
 
 type SyslogWriter struct {
+	level   int
 	network string
 	addr    string
 	tag     string
@@ -40,6 +41,9 @@ func (w *SyslogWriter) Init() (err error) {
 }
 
 func (w *SyslogWriter) Write(r *Record) (err error) {
+	if r.level < w.level {
+		return
+	}
 	s := ((*ShortRecord)(r)).String()
 
 	switch r.level {

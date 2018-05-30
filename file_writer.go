@@ -13,6 +13,7 @@ import (
 var pathVariableTable map[byte]func(*time.Time) int
 
 type FileWriter struct {
+	level         int
 	pathFmt       string
 	file          *os.File
 	fileBufWriter *bufio.Writer
@@ -67,6 +68,9 @@ func (w *FileWriter) SetPathPattern(pattern string) error {
 }
 
 func (w *FileWriter) Write(r *Record) error {
+	if r.level < w.level {
+		return nil
+	}
 	if w.fileBufWriter == nil {
 		return errors.New("no opened file")
 	}
