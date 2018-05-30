@@ -2,6 +2,7 @@ package log4go
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kdpujie/log4go/util"
 	"io/ioutil"
 	"strings"
@@ -90,5 +91,6 @@ func getLevel0(flag string, defaultFlag int) int {
 			return i
 		}
 	}
+	fmt.Printf("[ERROR] 未找到合适的日志级别，使用默认值:%d", defaultFlag)
 	return defaultFlag
 }
