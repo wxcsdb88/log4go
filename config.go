@@ -2,7 +2,6 @@ package log4go
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/kdpujie/log4go/util"
 	"io/ioutil"
 	"strings"
