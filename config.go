@@ -42,14 +42,13 @@ type LogConfig struct {
 
 func SetupLogWithConf(file string) (err error) {
 	var lc LogConfig
-	// 全局配置
-	defaultLevel := getLevel(lc.Level)
 	cnt, err := ioutil.ReadFile(file)
 
 	if err = json.Unmarshal(cnt, &lc); err != nil {
 		return
 	}
-
+	// 全局配置
+	defaultLevel := getLevel(lc.Level)
 	if lc.FileWriter.On {
 		w := NewFileWriter()
 		w.level = getLevel0(lc.FileWriter.Level, defaultLevel)
@@ -87,7 +86,7 @@ func getLevel(flag string) int {
 // 默认为Debug模式
 func getLevel0(flag string, defaultFlag int) int {
 	for i, f := range LEVEL_FLAGS {
-		if strings.ToUpper(flag) == f {
+		if strings.TrimSpace(strings.ToUpper(flag)) == f {
 			return i
 		}
 	}
