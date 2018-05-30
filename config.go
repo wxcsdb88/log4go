@@ -91,6 +91,6 @@ func getLevel0(flag string, defaultFlag int) int {
 			return i
 		}
 	}
-	fmt.Printf("[ERROR] 未找到合适的日志级别，使用默认值:%d \n", defaultFlag)
+	fmt.Printf("[ERROR] 未找到合适的日志级别[%s]，使用默认值:%d \n", flag, defaultFlag)
 	return defaultFlag
 }
