@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	LEVEL_FLAGS = [...]string{"DEBUG", " INFO", " WARN", "ERROR", "FATAL"}
+	LEVEL_FLAGS = [...]string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
 	recordPool  *sync.Pool
 )
 
