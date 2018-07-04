@@ -1,12 +1,26 @@
 {
-    "LogLevel" : "info",
+    "level" : "info",
 
-    "FileWriter" : {
-        "LogPath" : "/tmp/access-%Y%M%D.log",
-        "On": true
+    "file_writer" : {
+        "level": "debug",
+        "log_path": "/tmp/access-%Y%M%D.log",
+        "on": false
     },
 
-    "ConsoleWriter" : {
-        "On" : true
+    "console_writer" : {
+        "level": "error",
+        "on": true
+    },
+
+    "ali_loghub_writer" : {
+        "level":"debug",
+        "on": true,
+        "log_name":"dengine",
+        "project_name":"happyelements-data",
+        "endpoint":"cn-beijing.log.aliyuncs.com",
+        "access_key_id":"LTAIr66yTpB5LiK0",
+        "access_key_secret":"y1O3dgtHe3d2575jDGSKwwHAS9695c",
+        "store_name":"dsp_syslog",
+        "buf_size":1000
     }
 }

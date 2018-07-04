@@ -39,6 +39,7 @@ func (w *AliLogHubWriter) Init() (err error) {
 	if err != nil {
 		return
 	}
+	w.project.UsingHTTP = true
 	w.store, err = w.project.GetLogStore(w.storeName)
 	return
 }
