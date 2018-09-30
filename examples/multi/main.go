@@ -10,6 +10,17 @@ func SetLog() {
 
 	w2 := log.NewConsoleWriter()
 
+	kafKaConf := &log.ConfKafKaWriter{
+		Level:                   1,
+		On:                      true,
+		ProducerTopic:           "test",
+		ProducerReturnSuccesses: true,
+		ProducerTimeout:         30,
+		Brokers:                 []string{"0.0.0.0:9094"},
+	}
+	w3 := log.NewKafKaWriter(kafKaConf)
+	log.Register(w3)
+
 	log.Register(w1)
 	log.Register(w2)
 	log.SetLevel(log.ERROR)

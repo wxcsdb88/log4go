@@ -7,9 +7,10 @@
 package log4go
 
 import (
+	"time"
+
 	"github.com/aliyun/aliyun-log-go-sdk"
 	"github.com/gogo/protobuf/proto"
-	"time"
 )
 
 type AliLogHubWriter struct {
