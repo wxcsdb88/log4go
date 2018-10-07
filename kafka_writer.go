@@ -74,8 +74,8 @@ func (k *KafKaWriter) Write(r *Record) error {
 	}
 
 	if k.conf.Debug {
-		fmt.Printf("kafka-writer msg [topic: %v, partition: %v, offset %v, timestamp: %v]\nkey:   %v\nvalue: %v\n", msg.Topic,
-			msg.Partition, msg.Offset, msg.Timestamp, key, data)
+		fmt.Printf("kafka-writer msg [topic: %v, partition: %v, offset %v, timestamp: %v, brokers: %v]\nkey:   %v\nvalue: %v\n", msg.Topic,
+			msg.Partition, msg.Offset, msg.Timestamp, k.conf.Brokers, key, data)
 	}
 	go k.asyncWriteMessages(msg)
 
@@ -96,7 +96,6 @@ func (k *KafKaWriter) daemonProducer() {
 			k.stop <- true
 			return
 		}
-		// mes.Topic = k.conf.ProducerTopic
 		_, _, err := k.producer.SendMessage(mes)
 		if err != nil {
 			Error("SendMessage(topic=%s, key=%v, value=%v) err=%s \n", mes.Topic, mes.Key, mes.Value, err.Error())
