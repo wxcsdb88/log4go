@@ -52,14 +52,14 @@ func SetupLogWithConf(file string) (err error) {
 	defaultLevel := getLevel(lc.Level)
 	if lc.FileWriter.On {
 		w := NewFileWriter()
-		w.level = getLevel0(lc.FileWriter.Level, defaultLevel)
+		w.Level = getLevel0(lc.FileWriter.Level, defaultLevel)
 		w.SetPathPattern(lc.FileWriter.LogPath)
 		Register(w)
 	}
 
 	if lc.ConsoleWriter.On {
 		w := NewConsoleWriter()
-		w.level = getLevel0(lc.ConsoleWriter.Level, defaultLevel)
+		w.Level = getLevel0(lc.ConsoleWriter.Level, defaultLevel)
 		w.SetColor(lc.ConsoleWriter.Color)
 		Register(w)
 	}

@@ -33,17 +33,36 @@ func (r *colorRecord) String() string {
 	return ""
 }
 
+// ConsoleWriter console writer define
 type ConsoleWriter struct {
-	level int
+	Level int
 	color bool
 }
 
+// NewConsoleWriter create new console writer
 func NewConsoleWriter() *ConsoleWriter {
 	return &ConsoleWriter{}
 }
 
+// NewConsoleWriterWithLevel create new console writer with level
+func NewConsoleWriterWithLevel(level int) *FileWriter {
+	defaultLevel := DEBUG
+	maxLevel := len(LEVEL_FLAGS)
+	if maxLevel >= 1 {
+		maxLevel = maxLevel - 1
+	}
+
+	if level >= defaultLevel && level <= maxLevel {
+		defaultLevel = level
+	}
+	return &FileWriter{
+		Level: defaultLevel,
+	}
+}
+
+// Write console write
 func (w *ConsoleWriter) Write(r *Record) error {
-	if r.level < w.level {
+	if r.level < w.Level {
 		return nil
 	}
 	if w.color {
@@ -54,10 +73,12 @@ func (w *ConsoleWriter) Write(r *Record) error {
 	return nil
 }
 
+// Init console init without implement
 func (w *ConsoleWriter) Init() error {
 	return nil
 }
 
+// SetColor console output color control
 func (w *ConsoleWriter) SetColor(c bool) {
 	w.color = c
 }

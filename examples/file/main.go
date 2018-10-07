@@ -1,8 +1,9 @@
 package main
 
 import (
-	log "github.com/kdpujie/log4go"
 	"time"
+
+	log "github.com/kdpujie/log4go"
 )
 
 func SetLog() {
@@ -17,9 +18,9 @@ func SetLog() {
 	   notice: No second's variable
 	*/
 	w.SetPathPattern("/tmp/logs/error%Y%M%D%H%m.log")
+	w.Level = log.ERROR
 
 	log.Register(w)
-	log.SetLevel(log.ERROR)
 }
 
 func main() {

@@ -230,6 +230,8 @@ var (
 	takeup         = false
 )
 
+// SetLevel global set level is ignore
+// logger level should be set in specific logger
 func SetLevel(lvl int) {
 	//logger_default.level = lvl
 }

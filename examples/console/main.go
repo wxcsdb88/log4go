@@ -4,12 +4,13 @@ import (
 	log "github.com/kdpujie/log4go"
 )
 
+// SetLog set logger
 func SetLog() {
 	w := log.NewConsoleWriter()
 	w.SetColor(true)
+	w.Level = log.DEBUG
 
 	log.Register(w)
-	log.SetLevel(log.DEBUG)
 	log.SetLayout("2006-01-02 15:04:05")
 }
 

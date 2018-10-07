@@ -12,8 +12,9 @@ import (
 
 var pathVariableTable map[byte]func(*time.Time) int
 
+// FileWriter file writer define
 type FileWriter struct {
-	level         int
+	Level         int
 	pathFmt       string
 	file          *os.File
 	fileBufWriter *bufio.Writer
@@ -21,14 +22,47 @@ type FileWriter struct {
 	variables     []interface{}
 }
 
+// NewFileWriter create new file writer
 func NewFileWriter() *FileWriter {
 	return &FileWriter{}
 }
 
+// NewFileWriterWithLevel create new file writer with level
+func NewFileWriterWithLevel(level int) *FileWriter {
+	defaultLevel := DEBUG
+	maxLevel := len(LEVEL_FLAGS)
+	if maxLevel >= 1 {
+		maxLevel = maxLevel - 1
+	}
+
+	if level >= defaultLevel && level <= maxLevel {
+		defaultLevel = level
+	}
+	return &FileWriter{
+		Level: defaultLevel,
+	}
+}
+
+// Init for file writer
 func (w *FileWriter) Init() error {
 	return w.Rotate()
 }
 
+// Write for file writer
+func (w *FileWriter) Write(r *Record) error {
+	if r.level < w.Level {
+		return nil
+	}
+	if w.fileBufWriter == nil {
+		return errors.New("no opened file")
+	}
+	if _, err := w.fileBufWriter.WriteString(r.String()); err != nil {
+		return err
+	}
+	return nil
+}
+
+// SetPathPattern for file writer
 func (w *FileWriter) SetPathPattern(pattern string) error {
 	n := 0
 	for _, c := range pattern {
@@ -67,19 +101,7 @@ func (w *FileWriter) SetPathPattern(pattern string) error {
 	return nil
 }
 
-func (w *FileWriter) Write(r *Record) error {
-	if r.level < w.level {
-		return nil
-	}
-	if w.fileBufWriter == nil {
-		return errors.New("no opened file")
-	}
-	if _, err := w.fileBufWriter.WriteString(r.String()); err != nil {
-		return err
-	}
-	return nil
-}
-
+// Rotate for file writer
 func (w *FileWriter) Rotate() error {
 	now := time.Now()
 	v := 0
@@ -117,19 +139,20 @@ func (w *FileWriter) Rotate() error {
 		}
 	}
 
-	if file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644); err != nil {
+	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
 		return err
-	} else {
-		w.file = file
 	}
+	w.file = file
 
 	if w.fileBufWriter = bufio.NewWriterSize(w.file, 8192); w.fileBufWriter == nil {
-		return errors.New("new fileBufWriter failed.")
+		return errors.New("new fileBufWriter failed")
 	}
 
 	return nil
 }
 
+// Flush for file writer
 func (w *FileWriter) Flush() error {
 	if w.fileBufWriter != nil {
 		return w.fileBufWriter.Flush()
