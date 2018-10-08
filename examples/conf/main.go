@@ -1,19 +1,29 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"time"
+
 	log "github.com/kdpujie/log4go"
 )
 
 func main() {
-	if err := log.SetupLogWithConf("log.json"); err != nil {
+	file := flag.String("c", "log.json", "default log config file")
+	flag.Parse()
+
+	fmt.Println(*file)
+	if err := log.SetupLogWithConf(*file); err != nil {
 		panic(err)
 	}
 	defer log.Close()
 
 	var name = "skoo"
-	log.Debug("log4go by %s", name)
-	log.Info("log4go by %s", name)
-	log.Warn("log4go by %s", name)
-	log.Error("log4go by %s", name)
-	log.Fatal("log4go by %s", name)
+	log.Debug("log4go by %s debug", name)
+	log.Info("log4go by %s info", name)
+	log.Warn("log4go by %s warn", name)
+	log.Error("log4go by %s error", name)
+	log.Fatal("log4go by %s fatal", name)
+
+	time.Sleep(1 * time.Second)
 }

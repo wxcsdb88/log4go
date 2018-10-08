@@ -7,7 +7,7 @@ import (
 )
 
 func SetLog() {
-	w := log.NewFileWriter()
+	w := log.NewFileWriterWithLevel(log.ERROR)
 	/*
 	   %Y  year    (eg: 2014)
 	   %M  month   (eg: 07)
@@ -18,7 +18,6 @@ func SetLog() {
 	   notice: No second's variable
 	*/
 	w.SetPathPattern("/tmp/logs/error%Y%M%D%H%m.log")
-	w.Level = log.ERROR
 
 	log.Register(w)
 }

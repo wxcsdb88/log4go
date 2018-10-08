@@ -6,13 +6,11 @@ import (
 
 // SetLog set logger
 func SetLog() {
-	w1 := log.NewFileWriter()
+	w1 := log.NewFileWriterWithLevel(log.ERROR)
 	w1.SetPathPattern("/tmp/logs/error%Y%M%D%H.log")
 
-	w2 := log.NewConsoleWriter()
+	w2 := log.NewConsoleWriterWithLevel(log.WARNING)
 
-	w1.Level = log.ERROR
-	w2.Level = log.WARNING
 	log.Register(w1)
 	log.Register(w2)
 }

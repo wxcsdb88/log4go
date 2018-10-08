@@ -9,10 +9,10 @@ import (
 
 // ConfKafKaWriter kafka writer conf
 type ConfKafKaWriter struct {
-	Level      int  `json:"level"`
-	On         bool `json:"on"`
-	BufferSize int  `json:"BufferSize"`
-	Debug      bool `json:"debug"` // if true, will output the send msg
+	Level      string `json:"level"`
+	On         bool   `json:"on"`
+	BufferSize int    `json:"bufferSize"`
+	Debug      bool   `json:"debug"` // if true, will output the send msg
 
 	Key string `json:"key"` // kafka producer key, temp set, choice field
 
@@ -24,6 +24,8 @@ type ConfKafKaWriter struct {
 
 // KafKaWriter kafka writer
 type KafKaWriter struct {
+	level int
+
 	producer sarama.SyncProducer
 	messages chan *sarama.ProducerMessage
 	conf     *ConfKafKaWriter
@@ -35,9 +37,35 @@ type KafKaWriter struct {
 // NewKafKaWriter new kafka writer
 func NewKafKaWriter(conf *ConfKafKaWriter) *KafKaWriter {
 	stop := make(chan bool, 1)
+	defaultLevel := 0
+	if conf.Level != "" {
+		defaultLevel = getLevel0(conf.Level, defaultLevel)
+	}
+
 	return &KafKaWriter{
-		conf: conf,
-		stop: stop,
+		conf:  conf,
+		stop:  stop,
+		level: defaultLevel,
+	}
+}
+
+// NewKafKaWriterWithWriter new kafka writer with level
+func NewKafKaWriterWithWriter(conf *ConfKafKaWriter, level int) *KafKaWriter {
+	stop := make(chan bool, 1)
+	defaultLevel := DEBUG
+	maxLevel := len(LEVEL_FLAGS)
+	if maxLevel >= 1 {
+		maxLevel = maxLevel - 1
+	}
+
+	if level >= defaultLevel && level <= maxLevel {
+		defaultLevel = level
+	}
+
+	return &KafKaWriter{
+		conf:  conf,
+		stop:  stop,
+		level: defaultLevel,
 	}
 }
 
@@ -52,7 +80,7 @@ func (k *KafKaWriter) Init() error {
 
 // Write service for Record
 func (k *KafKaWriter) Write(r *Record) error {
-	if r.level < k.conf.Level {
+	if r.level < k.level {
 		return nil
 	}
 

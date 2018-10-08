@@ -39,6 +39,7 @@ type LogConfig struct {
 	FileWriter      ConfFileWriter      `json:"file_writer"`
 	ConsoleWriter   ConfConsoleWriter   `json:"console_writer"`
 	AliLoghubWriter ConfAliLogHubWriter `json:"ali_loghub_writer"`
+	KafKaWriter     ConfKafKaWriter     `json:"kafka_writer"`
 }
 
 func SetupLogWithConf(file string) (err error) {
@@ -52,14 +53,14 @@ func SetupLogWithConf(file string) (err error) {
 	defaultLevel := getLevel(lc.Level)
 	if lc.FileWriter.On {
 		w := NewFileWriter()
-		w.Level = getLevel0(lc.FileWriter.Level, defaultLevel)
+		w.level = getLevel0(lc.FileWriter.Level, defaultLevel)
 		w.SetPathPattern(lc.FileWriter.LogPath)
 		Register(w)
 	}
 
 	if lc.ConsoleWriter.On {
 		w := NewConsoleWriter()
-		w.Level = getLevel0(lc.ConsoleWriter.Level, defaultLevel)
+		w.level = getLevel0(lc.ConsoleWriter.Level, defaultLevel)
 		w.SetColor(lc.ConsoleWriter.Color)
 		Register(w)
 	}
@@ -74,6 +75,12 @@ func SetupLogWithConf(file string) (err error) {
 		w.SetProject(lc.AliLoghubWriter.ProjectName, lc.AliLoghubWriter.StoreName)
 		w.SetEndpoint(lc.AliLoghubWriter.Endpoint)
 		w.SetAccessKey(lc.AliLoghubWriter.AccessKeyId, lc.AliLoghubWriter.AccessKeySecret)
+		Register(w)
+	}
+
+	if lc.KafKaWriter.On {
+		w := NewKafKaWriter(&lc.KafKaWriter)
+		w.level = getLevel0(lc.KafKaWriter.Level, defaultLevel)
 		Register(w)
 	}
 	// 全局配置

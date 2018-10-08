@@ -14,7 +14,7 @@ var pathVariableTable map[byte]func(*time.Time) int
 
 // FileWriter file writer define
 type FileWriter struct {
-	Level         int
+	level         int
 	pathFmt       string
 	file          *os.File
 	fileBufWriter *bufio.Writer
@@ -39,7 +39,7 @@ func NewFileWriterWithLevel(level int) *FileWriter {
 		defaultLevel = level
 	}
 	return &FileWriter{
-		Level: defaultLevel,
+		level: defaultLevel,
 	}
 }
 
@@ -50,7 +50,7 @@ func (w *FileWriter) Init() error {
 
 // Write for file writer
 func (w *FileWriter) Write(r *Record) error {
-	if r.level < w.Level {
+	if r.level < w.level {
 		return nil
 	}
 	if w.fileBufWriter == nil {
