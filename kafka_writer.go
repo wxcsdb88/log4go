@@ -1,11 +1,27 @@
 package log4go
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/Shopify/sarama"
 )
+
+const timestampFormat = "2006-01-02T15:04:05.000+0800"
+
+// KafKaMSGFields kafka msg fields
+type KafKaMSGFields struct {
+	AppID     int    `json:"appId"`     // init field
+	AppEnv    string `json:"appEnv"`    // init field
+	ESIndex   string `json:"esIndex"`   // required, init field
+	Hostname  string `json:"hostname"`  // init field
+	Level     string `json:"level"`     // dynamic, set by logger
+	Message   string `json:"message"`   // required, dynamic
+	ServerIP  string `json:"serverIp"`  // required, init field, set by app
+	Timestamp string `json:"timeStamp"` // required, dynamic, set by logger
+	Now       int64  `json:"now"`       // choice
+}
 
 // ConfKafKaWriter kafka writer conf
 type ConfKafKaWriter struct {
@@ -20,6 +36,8 @@ type ConfKafKaWriter struct {
 	ProducerReturnSuccesses bool     `json:"producerReturnSuccesses"`
 	ProducerTimeout         int64    `json:"producerTimeout"` //ms
 	Brokers                 []string `json:"brokers"`
+
+	MSG KafKaMSGFields
 }
 
 // KafKaWriter kafka writer
@@ -83,10 +101,23 @@ func (k *KafKaWriter) Write(r *Record) error {
 		return nil
 	}
 
-	data := r.info
-	if data == "" {
+	logMsg := r.info
+	if logMsg == "" {
 		return nil
 	}
+	data := k.conf.MSG
+	// timestamp, level
+	data.Level = LEVEL_FLAGS[r.level]
+	now := time.Now()
+	data.Now = now.Unix()
+	data.Timestamp = now.Format(timestampFormat)
+	data.Message = logMsg
+
+	byteData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	jsonData := string(byteData)
 
 	key := ""
 	if k.conf.Key != "" {
@@ -97,12 +128,12 @@ func (k *KafKaWriter) Write(r *Record) error {
 		Topic:     k.conf.ProducerTopic,
 		Timestamp: time.Now().Local(),
 		Key:       sarama.ByteEncoder(key),
-		Value:     sarama.ByteEncoder(data),
+		Value:     sarama.ByteEncoder(jsonData),
 	}
 
 	if k.conf.Debug {
 		fmt.Printf("kafka-writer msg [topic: %v, partition: %v, offset %v, timestamp: %v, brokers: %v]\nkey:   %v\nvalue: %v\n", msg.Topic,
-			msg.Partition, msg.Offset, msg.Timestamp, k.conf.Brokers, key, data)
+			msg.Partition, msg.Offset, msg.Timestamp, k.conf.Brokers, key, jsonData)
 	}
 	go k.asyncWriteMessages(msg)
 
