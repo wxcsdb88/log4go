@@ -20,6 +20,15 @@ func SetLog() {
 		ProducerTimeout:         100,
 		Brokers:                 []string{"127.0.0.1:9092"},
 		// Brokers: []string{"localhost:9092"},
+		MSG: log.KafKaMSGFields{
+			ExtraFields: map[string]interface{}{
+				"appId":    188,
+				"appEnv":   "test",
+				"hostname": "futurever",
+				"keys":     123,
+				"chain":    "3123",
+			},
+		},
 	}
 	w2 := log.NewKafKaWriterWithWriter(kafKaConf, log.ERROR)
 

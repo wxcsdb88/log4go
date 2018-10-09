@@ -12,15 +12,13 @@ const timestampFormat = "2006-01-02T15:04:05.000+0800"
 
 // KafKaMSGFields kafka msg fields
 type KafKaMSGFields struct {
-	AppID     int    `json:"appId"`     // init field
-	AppEnv    string `json:"appEnv"`    // init field
-	ESIndex   string `json:"esIndex"`   // required, init field
-	Hostname  string `json:"hostname"`  // init field
-	Level     string `json:"level"`     // dynamic, set by logger
-	Message   string `json:"message"`   // required, dynamic
-	ServerIP  string `json:"serverIp"`  // required, init field, set by app
-	Timestamp string `json:"timeStamp"` // required, dynamic, set by logger
-	Now       int64  `json:"now"`       // choice
+	ESIndex     string                 `json:"esIndex"` // required, init field
+	level       string                 // dynamic, set by logger
+	Message     string                 `json:"message"`     // required, dynamic
+	ServerIP    string                 `json:"serverIp"`    // required, init field, set by app
+	Timestamp   string                 `json:"timeStamp"`   // required, dynamic, set by logger
+	Now         int64                  `json:"now"`         // choice
+	ExtraFields map[string]interface{} `json:"extraFields"` // extra fields will be added
 }
 
 // ConfKafKaWriter kafka writer conf
@@ -107,7 +105,7 @@ func (k *KafKaWriter) Write(r *Record) error {
 	}
 	data := k.conf.MSG
 	// timestamp, level
-	data.Level = LEVEL_FLAGS[r.level]
+	data.level = LEVEL_FLAGS[r.level]
 	now := time.Now()
 	data.Now = now.Unix()
 	data.Timestamp = now.Format(timestampFormat)
@@ -117,7 +115,24 @@ func (k *KafKaWriter) Write(r *Record) error {
 	if err != nil {
 		return err
 	}
-	jsonData := string(byteData)
+
+	var structData map[string]interface{}
+	json.Unmarshal(byteData, &structData)
+	delete(structData, "extraFields")
+
+	// not exist new fields will be added
+	for k, v := range data.ExtraFields {
+		if _, ok := structData[k]; !ok {
+			structData[k] = v
+		}
+	}
+
+	jsonStructDataByte, err := json.Marshal(structData)
+	if err != nil {
+		return err
+	}
+
+	jsonData := string(jsonStructDataByte)
 
 	key := ""
 	if k.conf.Key != "" {
