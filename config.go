@@ -42,13 +42,8 @@ type LogConfig struct {
 	KafKaWriter     ConfKafKaWriter     `json:"kafka_writer"`
 }
 
-func SetupLogWithConf(file string) (err error) {
-	var lc LogConfig
-	cnt, err := ioutil.ReadFile(file)
-
-	if err = json.Unmarshal(cnt, &lc); err != nil {
-		return
-	}
+// SetupLog setup log
+func SetupLog(lc LogConfig) (err error) {
 	// 全局配置
 	defaultLevel := getLevel(lc.Level)
 	if lc.FileWriter.On {
@@ -84,7 +79,18 @@ func SetupLogWithConf(file string) (err error) {
 		Register(w)
 	}
 	// 全局配置
-	return
+	return nil
+}
+
+// SetupLogWithConf setup log with config file
+func SetupLogWithConf(file string) (err error) {
+	var lc LogConfig
+	cnt, err := ioutil.ReadFile(file)
+
+	if err = json.Unmarshal(cnt, &lc); err != nil {
+		return
+	}
+	return SetupLog(lc)
 }
 
 func getLevel(flag string) int {

@@ -30,8 +30,7 @@ type KafKaWriter struct {
 	messages chan *sarama.ProducerMessage
 	conf     *ConfKafKaWriter
 
-	active bool // default true, if connect failed or timeout will false
-	stop   chan bool
+	stop chan bool
 }
 
 // NewKafKaWriter new kafka writer
