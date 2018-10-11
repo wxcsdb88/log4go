@@ -11,9 +11,9 @@ func SetLog() {
 	w1 := log.NewConsoleWriterWithLevel(log.DEBUG)
 
 	kafKaConf := &log.ConfKafKaWriter{
-		Debug:                   true,
-		Key:                     "test",
-		BufferSize:              1,
+		Debug: true,
+		// Key:                     "test" + strconv.FormatInt(time.Now().UnixNano(), 10),
+		BufferSize:              4,
 		On:                      true,
 		ProducerTopic:           "kafka1",
 		ProducerReturnSuccesses: true,
@@ -25,8 +25,7 @@ func SetLog() {
 				"appId":    188,
 				"appEnv":   "test",
 				"hostname": "futurever",
-				"keys":     123,
-				"chain":    "3123",
+				"now":      time.Now().UnixNano(),
 			},
 		},
 	}
@@ -50,7 +49,7 @@ func main() {
 
 	var name = "kafka-writer"
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 2; i++ {
 		log.Debug("log4go by %s debug", name)
 		log.Info("log4go by %s info", name)
 		log.Warn("log4go by %s warn", name)

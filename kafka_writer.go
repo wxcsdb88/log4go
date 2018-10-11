@@ -40,8 +40,7 @@ type ConfKafKaWriter struct {
 
 // KafKaWriter kafka writer
 type KafKaWriter struct {
-	level int
-
+	level    int
 	producer sarama.SyncProducer
 	messages chan *sarama.ProducerMessage
 	conf     *ConfKafKaWriter
@@ -140,15 +139,15 @@ func (k *KafKaWriter) Write(r *Record) error {
 	}
 
 	msg := &sarama.ProducerMessage{
-		Topic:     k.conf.ProducerTopic,
-		Timestamp: time.Now().Local(),
-		Key:       sarama.ByteEncoder(key),
-		Value:     sarama.ByteEncoder(jsonData),
+		Topic: k.conf.ProducerTopic,
+		// Timestamp: time.Now(), // auto generate
+		Key:   sarama.ByteEncoder(key),
+		Value: sarama.ByteEncoder(jsonData),
 	}
 
 	if k.conf.Debug {
-		fmt.Printf("kafka-writer msg [topic: %v, partition: %v, offset %v, timestamp: %v, brokers: %v]\nkey:   %v\nvalue: %v\n", msg.Topic,
-			msg.Partition, msg.Offset, msg.Timestamp, k.conf.Brokers, key, jsonData)
+		fmt.Printf("kafka-writer msg [topic: %v, timestamp: %v, brokers: %v]\nkey:   %v\nvalue: %v\n", msg.Topic,
+			msg.Timestamp, k.conf.Brokers, key, jsonData)
 	}
 	go k.asyncWriteMessages(msg)
 
@@ -169,9 +168,18 @@ func (k *KafKaWriter) daemonProducer() {
 			k.stop <- true
 			return
 		}
-		_, _, err := k.producer.SendMessage(mes)
+
+		partition, offset, err := k.producer.SendMessage(mes)
+
 		if err != nil {
-			Error("SendMessage(topic=%s, key=%v, value=%v) err=%s \n", mes.Topic, mes.Key, mes.Value, err.Error())
+			fmt.Printf("SendMessage(topic=%s, partition=%v, offset=%v, key=%s, value=%s,timstamp=%v) err=%s\n\n", mes.Topic,
+				partition, offset, mes.Key, mes.Value, mes.Timestamp, err.Error())
+			continue
+		} else {
+			if k.conf.Debug {
+				fmt.Printf("SendMessage(topic=%s, partition=%v, offset=%v, key=%s, value=%s,timstamp=%v)\n\n", mes.Topic,
+					partition, offset, mes.Key, mes.Value, mes.Timestamp)
+			}
 		}
 	}
 }
@@ -182,6 +190,17 @@ func (k *KafKaWriter) Start() (err error) {
 	cfg := sarama.NewConfig()
 	cfg.Producer.Return.Successes = k.conf.ProducerReturnSuccesses
 	cfg.Producer.Timeout = time.Duration(k.conf.ProducerTimeout) * time.Millisecond
+	cfg.Version = sarama.MaxVersion // sarama.V2_0_0_0, if want set timestamp for data should set version
+
+	// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil then a
+	// random partition is chosen. Otherwise the FNV-1a hash of the encoded bytes of the message key is used,
+	// modulus the number of partitions. This ensures that messages with the same key always end up on the
+	// same partition.
+	// cfg.Producer.Partitioner = sarama.NewHashPartitioner
+	// cfg.Producer.Partitioner = sarama.NewRandomPartitioner
+	cfg.Producer.Partitioner = sarama.NewRoundRobinPartitioner
+	// cfg.Producer.Partitioner = sarama.NewReferenceHashPartitioner
+
 	k.producer, err = sarama.NewSyncProducer(k.conf.Brokers, cfg)
 	if err != nil {
 		fmt.Printf("sarama.NewSyncProducer err, message=%s \n", err)
