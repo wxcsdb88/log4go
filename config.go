@@ -34,8 +34,10 @@ type ConfAliLogHubWriter struct {
 	BufSize         int    `json:"buf_size"`
 }
 
+// LogConfig log config
 type LogConfig struct {
 	Level           string              `json:"level"`
+	FullPath        bool                `json:"fullPath"`
 	FileWriter      ConfFileWriter      `json:"file_writer"`
 	ConsoleWriter   ConfConsoleWriter   `json:"console_writer"`
 	AliLoghubWriter ConfAliLogHubWriter `json:"ali_loghub_writer"`
@@ -46,6 +48,9 @@ type LogConfig struct {
 func SetupLog(lc LogConfig) (err error) {
 	// 全局配置
 	defaultLevel := getLevel(lc.Level)
+	fullPath := lc.FullPath
+	ShowFullPath(fullPath)
+
 	if lc.FileWriter.On {
 		w := NewFileWriter()
 		w.level = getLevel0(lc.FileWriter.Level, defaultLevel)

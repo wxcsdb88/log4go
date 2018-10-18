@@ -13,7 +13,8 @@ const timestampFormat = "2006-01-02T15:04:05.000+0800"
 // KafKaMSGFields kafka msg fields
 type KafKaMSGFields struct {
 	ESIndex     string                 `json:"esIndex"` // required, init field
-	level       string                 // dynamic, set by logger
+	Level       string                 // dynamic, set by logger
+	Code        string                 `json:"file"`        // source code file:line_number
 	Message     string                 `json:"message"`     // required, dynamic
 	ServerIP    string                 `json:"serverIp"`    // required, init field, set by app
 	Timestamp   string                 `json:"timeStamp"`   // required, dynamic, set by logger
@@ -104,11 +105,12 @@ func (k *KafKaWriter) Write(r *Record) error {
 	}
 	data := k.conf.MSG
 	// timestamp, level
-	data.level = LEVEL_FLAGS[r.level]
+	data.Level = LEVEL_FLAGS[r.level]
 	now := time.Now()
 	data.Now = now.Unix()
 	data.Timestamp = now.Format(timestampFormat)
 	data.Message = logMsg
+	data.Code = r.code
 
 	byteData, err := json.Marshal(data)
 	if err != nil {

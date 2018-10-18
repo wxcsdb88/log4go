@@ -1,5 +1,6 @@
 {
   "level": "info",
+  "fullPath": true,
 
   "file_writer": {
     "level": "debug",

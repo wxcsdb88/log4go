@@ -58,6 +58,8 @@ type Logger struct {
 	lastTimeStr string
 	c           chan bool
 	layout      string
+
+	fullPath bool // show full path, default only show file:line_number
 }
 
 func NewLogger() *Logger {
@@ -142,7 +144,11 @@ func (l *Logger) deliverRecordToWriter(level int, format string, args ...interfa
 	// source code, file and line num
 	_, file, line, ok := runtime.Caller(2)
 	if ok {
-		code = path.Base(file) + ":" + strconv.Itoa(line)
+		if l.fullPath {
+			code = file + ":" + strconv.Itoa(line)
+		} else {
+			code = path.Base(file) + ":" + strconv.Itoa(line)
+		}
 	}
 
 	// format time
@@ -266,6 +272,11 @@ func Register(w Writer) {
 
 func Close() {
 	logger_default.Close()
+}
+
+// ShowFullPath show full path
+func ShowFullPath(show bool) {
+	logger_default.fullPath = show
 }
 
 func init() {
