@@ -14,6 +14,7 @@ func SetLog() {
 		Debug: true,
 		// Key:                     "test" + strconv.FormatInt(time.Now().UnixNano(), 10),
 		BufferSize:              4,
+		VersionStr:              "0.10.0.1",
 		On:                      true,
 		ProducerTopic:           "kafka1",
 		ProducerReturnSuccesses: true,

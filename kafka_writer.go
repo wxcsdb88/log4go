@@ -27,7 +27,8 @@ type ConfKafKaWriter struct {
 	Level      string `json:"level"`
 	On         bool   `json:"on"`
 	BufferSize int    `json:"bufferSize"`
-	Debug      bool   `json:"debug"` // if true, will output the send msg
+	Debug      bool   `json:"debug"`   // if true, will output the send msg
+	VersionStr string `json:"version"` // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
 
 	Key string `json:"key"` // kafka producer key, temp set, choice field
 
@@ -142,7 +143,8 @@ func (k *KafKaWriter) Write(r *Record) error {
 
 	msg := &sarama.ProducerMessage{
 		Topic: k.conf.ProducerTopic,
-		// Timestamp: time.Now(), // auto generate
+		// autofill or use specify timestamp, you must set Version >= sarama.V0_10_0_1
+		// Timestamp: time.Now(),
 		Key:   sarama.ByteEncoder(key),
 		Value: sarama.ByteEncoder(jsonData),
 	}
@@ -192,7 +194,17 @@ func (k *KafKaWriter) Start() (err error) {
 	cfg := sarama.NewConfig()
 	cfg.Producer.Return.Successes = k.conf.ProducerReturnSuccesses
 	cfg.Producer.Timeout = time.Duration(k.conf.ProducerTimeout) * time.Millisecond
-	cfg.Version = sarama.MaxVersion // sarama.V2_0_0_0, if want set timestamp for data should set version
+
+	// if want set timestamp for data should set version
+	versionStr := k.conf.VersionStr
+	kafkaVer := sarama.V0_10_0_1
+	if versionStr != "" {
+		if kafkaVersion, err := sarama.ParseKafkaVersion(versionStr); err == nil {
+			// should be careful set the version, maybe occur EOF error
+			kafkaVer = kafkaVersion
+		}
+	}
+	cfg.Version = kafkaVer
 
 	// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil then a
 	// random partition is chosen. Otherwise the FNV-1a hash of the encoded bytes of the message key is used,
