@@ -24,11 +24,12 @@ type KafKaMSGFields struct {
 
 // ConfKafKaWriter kafka writer conf
 type ConfKafKaWriter struct {
-	Level      string `json:"level"`
-	On         bool   `json:"on"`
-	BufferSize int    `json:"bufferSize"`
-	Debug      bool   `json:"debug"`   // if true, will output the send msg
-	VersionStr string `json:"version"` // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
+	Level          string `json:"level"`
+	On             bool   `json:"on"`
+	BufferSize     int    `json:"bufferSize"`
+	Debug          bool   `json:"debug"`          // if true, will output the send msg
+	SpecifyVersion bool   `json:"specifyVersion"` // if use the input version, default false
+	VersionStr     string `json:"version"`        // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
 
 	Key string `json:"key"` // kafka producer key, temp set, choice field
 
@@ -198,12 +199,16 @@ func (k *KafKaWriter) Start() (err error) {
 	// if want set timestamp for data should set version
 	versionStr := k.conf.VersionStr
 	kafkaVer := sarama.V0_10_0_1
-	if versionStr != "" {
-		if kafkaVersion, err := sarama.ParseKafkaVersion(versionStr); err == nil {
-			// should be careful set the version, maybe occur EOF error
-			kafkaVer = kafkaVersion
+
+	if k.conf.SpecifyVersion {
+		if versionStr != "" {
+			if kafkaVersion, err := sarama.ParseKafkaVersion(versionStr); err == nil {
+				// should be careful set the version, maybe occur EOF error
+				kafkaVer = kafkaVersion
+			}
 		}
 	}
+	// if not specify the version, use the sarama.V0_10_0_1 to guarante the timestamp can be control
 	cfg.Version = kafkaVer
 
 	// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil then a

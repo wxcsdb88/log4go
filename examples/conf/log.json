@@ -31,6 +31,7 @@
     "on": false,
     "bufferSize": 10,
     "debug": true,
+    "specifyVersion":true,
     "version":"0.10.0.1",
     "key": "kafka-test",
     "producerTopic": "kafka-log4go-test",

@@ -13,8 +13,10 @@ func SetLog() {
 	kafKaConf := &log.ConfKafKaWriter{
 		Debug: true,
 		// Key:                     "test" + strconv.FormatInt(time.Now().UnixNano(), 10),
-		BufferSize:              4,
-		VersionStr:              "0.10.0.1",
+		BufferSize:     4,
+		SpecifyVersion: true, // true, version is effect; false use 0.10.0.1
+		// VersionStr:              "0.10.0.1",
+		VersionStr:              "0.8.2.0", // default 0.10.0.1, min: 0.8.2.0
 		On:                      true,
 		ProducerTopic:           "kafka1",
 		ProducerReturnSuccesses: true,
